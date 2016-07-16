@@ -140,8 +140,8 @@ func TestExtractMachinePage(t *testing.T) {
 
 func TestMachinesPatchAddModify(t *testing.T) {
 	reqBody := `
-	[{"op": "add", "path": "/XXX/metadata/foo", "value": "bar"},
-	 {"op": "replace", "path": "/YYY/metadata/ping", "value": "splat"}]
+	[{"op": "add", "path": "/XXX/metadata/foo", "value": { "value": "bar" }},
+	 {"op": "replace", "path": "/YYY/metadata/ping", "value": { "value": "splat" }}]
 	`
 
 	resource, rw := fakeMachinesSetup()

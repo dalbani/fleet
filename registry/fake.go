@@ -279,7 +279,7 @@ func (f *FakeRegistry) UnitHeartbeat(name, machID string, ttl time.Duration) err
 
 func (f *FakeRegistry) ClearUnitHeartbeat(string) {}
 
-func (f *FakeRegistry) SetMachineMetadata(machID string, key string, value string) error {
+func (f *FakeRegistry) SetMachineMetadata(machID string, key string, value string, ttl time.Duration) error {
 	for _, mach := range f.machines {
 		if mach.ID == machID {
 			mach.Metadata[key] = value

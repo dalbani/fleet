@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"path"
 	"regexp"
+	"time"
 
 	"github.com/coreos/fleet/client"
 	"github.com/coreos/fleet/log"
@@ -43,9 +44,12 @@ type machinesResource struct {
 }
 
 type machineMetadataOp struct {
-	Operation string `json:"op"`
-	Path      string
-	Value     string
+	Operation string	`json:"op"`
+	Path      string	`json:"path"`
+	Value     struct {
+		Value	string	`json:"value"`
+		Ttl	string	`json:"ttl,omitempty"`
+	}
 }
 
 func (mr *machinesResource) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
@@ -100,7 +104,7 @@ func (mr *machinesResource) patch(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		if op.Operation != "remove" && len(op.Value) == 0 {
+		if op.Operation != "remove" && len(op.Value.Value) == 0 {
 			sendError(rw, http.StatusBadRequest, errors.New("invalid value: add and replace require a value"))
 			return
 		}
@@ -119,7 +123,14 @@ func (mr *machinesResource) patch(rw http.ResponseWriter, req *http.Request) {
 				return
 			}
 		} else {
-			err := mr.cAPI.SetMachineMetadata(machID, key, op.Value)
+			ttl, err := time.ParseDuration(op.Value.Ttl)
+			if err != nil || ttl <= 0 {
+				sendError(rw, http.StatusBadRequest, errors.New(
+					"invalid ttl: must be a positive number"))
+				return
+			}
+
+			err = mr.cAPI.SetMachineMetadata(machID, key, op.Value.Value, ttl)
 			if err != nil {
 				sendError(rw, http.StatusInternalServerError, err)
 				return

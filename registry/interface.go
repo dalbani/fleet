@@ -39,7 +39,7 @@ type Registry interface {
 	SetMachineState(ms machine.MachineState, ttl time.Duration) (uint64, error)
 	MachineState(machID string) (machine.MachineState, error)
 	UnscheduleUnit(name, machID string) error
-	SetMachineMetadata(machID, key, value string) error
+	SetMachineMetadata(machID, key, value string, ttl time.Duration) error
 	DeleteMachineMetadata(machID, key string) error
 
 	UnitRegistry

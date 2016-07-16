@@ -121,9 +121,11 @@ func (r *EtcdRegistry) MachineState(machID string) (machine.MachineState, error)
 	return readMachineState(resp.Node)
 }
 
-func (r *EtcdRegistry) SetMachineMetadata(machID string, key string, value string) error {
+func (r *EtcdRegistry) SetMachineMetadata(machID string, key string, value string, ttl time.Duration) error {
 	key = path.Join(r.keyPrefix, machinePrefix, machID, "metadata", key)
-	opts := &etcd.SetOptions{}
+	opts := &etcd.SetOptions{
+		TTL: ttl,
+	}
 	_, err := r.kAPI.Set(context.Background(), key, value, opts)
 	return err
 }
@@ -132,7 +134,7 @@ func (r *EtcdRegistry) DeleteMachineMetadata(machID string, key string) error {
 	// Deleting a key sets its value to "" to allow for intelligent merging
 	// between the machine-defined metadata and the dynamic metadata.
 	// See mergeMetadata for more detail.
-	return r.SetMachineMetadata(machID, key, "")
+	return r.SetMachineMetadata(machID, key, "", -1)
 }
 
 func (r *EtcdRegistry) RemoveMachineState(machID string) error {

@@ -17,11 +17,12 @@ package client
 import (
 	"github.com/coreos/fleet/machine"
 	"github.com/coreos/fleet/schema"
+	"time"
 )
 
 type API interface {
 	Machines() ([]machine.MachineState, error)
-	SetMachineMetadata(machID, key, value string) error
+	SetMachineMetadata(machID, key, value string, ttl time.Duration) error
 	DeleteMachineMetadata(machID, key string) error
 
 	Unit(string) (*schema.Unit, error)
